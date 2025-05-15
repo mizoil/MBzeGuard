@@ -98,13 +98,14 @@ main() {
 }
 
 add_tunnel() {
-    echo "What type of VPN or proxy will be used? We also can automatically configure Wireguard and Amnezia WireGuard."
-    echo "1) VLESS, Shadowsocks (A sing-box will be installed)"
-    echo "2) Wireguard"
-    echo "3) AmneziaWG"
-    echo "4) OpenVPN"
-    echo "5) OpenConnect"
-    echo "6) Skip this step"
+    printf "\033[1;32mКакой VPN или прокси установить? MBzeGuard и Wireguard можно настроить автоматически.\033[0m\n"
+    
+    printf "\033[33m1) MBzeGuard\033[0m\n" 
+    printf "\033[31m2) Wireguard\033[0m\n" 
+    printf "\033[35m3) AmneziaWG\033[0m\n" 
+    printf "\033[36m4) OpenVPN\033[0m\n"
+    printf "\033[37m5) OpenConnect\033[0m\n"
+    printf "\033[1;36m6) Skip this step\033[0m\n"
 
     while true; do
         read -r -p '' TUNNEL
