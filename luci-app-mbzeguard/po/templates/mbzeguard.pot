@@ -328,13 +328,22 @@ msgstr ""
 msgid "Update lists"
 msgstr ""
 
+msgid "Update all lists in config"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
 msgid "View Logs"
 msgstr ""
 
-msgid "Support"
+msgid "Telegram Support"
 msgstr ""
 
-msgid "Click to open Telegram support"
+msgid "Click to open the MBzeGuard support group on Telegram"
+msgstr ""
+
+msgid "MBzeGuard"
 msgstr ""
 
 msgid "Failed to copy logs: "
