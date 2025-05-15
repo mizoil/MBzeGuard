@@ -1,10 +1,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mbzeguard
-PKG_VERSION:=0.2.5
+PKG_VERSION:=0.2.6
 PKG_RELEASE:=1
 
-PKG_MAINTAINER:=mizoil <mbzeguard@mizoil.info>
+PKG_MAINTAINER:=mizoil <mbzeguard@mizoil>
 PKG_LICENSE:=GPL-2.0-or-later
 
 include $(INCLUDE_DIR)/package.mk

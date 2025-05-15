@@ -16,7 +16,7 @@ msgstr ""
 msgid "Secondary VPN/Proxy Enable"
 msgstr ""
 
-msgid "Enable secondary VPN/Proxy configuration"
+msgid "Enable YouTube proxy (Not recommended)."
 msgstr ""
 
 msgid "Connection Type"

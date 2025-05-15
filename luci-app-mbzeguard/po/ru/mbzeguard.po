@@ -16,8 +16,8 @@ msgstr "Второй маршрут"
 msgid "Secondary VPN/Proxy Enable"
 msgstr "Включить второй VPN/Proxy"
 
-msgid "Enable secondary VPN/Proxy configuration"
-msgstr "Включить конфигурацию второго VPN/Proxy"
+msgid "Enable YouTube proxy (Not recommended)."
+msgstr "Включить Proxy YouTube (Не рекомендую)."
 
 msgid "Connection Type"
 msgstr "Тип подключения"

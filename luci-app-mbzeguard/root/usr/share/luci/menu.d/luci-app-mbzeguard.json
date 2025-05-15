@@ -1,14 +1,14 @@
 {
-  "admin/services/mbzeguard": {
-    "title": "mbzeguard",
+  "admin/vpn/mbzeguard": {
+    "title": "MBzeGuard",
     "order": 42,
     "action": {
       "type": "view",
       "path": "mbzeguard/mbzeguard"
     },
     "depends": {
-			"acl": [ "luci-app-mbzeguard" ],
-			"uci": { "mbzeguard": true }
-		}
+      "acl": [ "luci-app-mbzeguard" ],
+      "uci": { "mbzeguard": true }
+    }
   }
 }
