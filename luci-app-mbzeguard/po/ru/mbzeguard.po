@@ -325,17 +325,26 @@ msgstr "Системные логи"
 msgid "View recent system logs related to MBzeGuard"
 msgstr "Просмотр недавних системных логов, связанных с MBzeGuard"
 
+msgid "Update lists"
+msgstr "Обновить списки"
+
 msgid "Update all lists in config"
 msgstr "Обновить все списки в конфигурации"
+
+msgid "Update"
+msgstr "Обновить"
 
 msgid "View Logs"
 msgstr "Просмотр логов"
 
-msgid "Support"
-msgstr "Поддержка"
+msgid "Telegram Support"
+msgstr "Поддержка в Telegram"
 
-msgid "Click to open Telegram support"
-msgstr "Нажмите, чтобы открыть поддержку в Telegram"
+msgid "Click to open the MBzeGuard support group on Telegram"
+msgstr "Нажмите, чтобы открыть группу поддержки MBzeGuard в Telegram"
+
+msgid "MBzeGuard"
+msgstr "MBzeGuard"
 
 msgid "Failed to copy logs: "
 msgstr "Ошибка копирования логов: "
