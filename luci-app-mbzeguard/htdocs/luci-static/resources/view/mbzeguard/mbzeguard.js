@@ -794,7 +794,7 @@ return view.extend({
         o = s.taboption('diagnostics', form.Button, '_list_update');
         o.title = _('Update lists');
         o.description = _('Update all lists in config');
-        o.inputtitle = _('Update lists');
+        o.inputtitle = _('Update');
         o.inputstyle = 'apply';
         o.onclick = function () {
             fs.exec('/etc/init.d/mbzeguard', ['list_update']);
@@ -810,16 +810,14 @@ return view.extend({
             ]);
         };
 
-        o = s.taboption('diagnostics', form.DummyValue, '_support_link', _('Support'));
-        o.rawhtml = true;
-        o.default = `
-            <a href="https://t.me/MBzeGuard" target="_blank" class="btn cbi-button cbi-button-apply" style="margin-right:10px;">
-                MBzeGuard
-            </a>
-            <div style="margin-top:5px; color: #888;">
-                <i class="cbi-tooltip">❓</i> Click to open Telegram support
-            </div>
-        `;
+        o = s.taboption('diagnostics', form.Button, '_telegram_support');
+        o.title       = _('Telegram Support');
+        o.description = _('Click to open the MBzeGuard support group on Telegram');
+        o.inputtitle  = _('MBzeGuard');
+        o.inputstyle  = 'apply';
+        o.onclick     = function () {
+            window.open('https://t.me/MBzeGuard', '_blank');
+        };
 
         return m.render();
     }
