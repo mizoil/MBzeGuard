@@ -436,7 +436,7 @@ return view.extend({
 
         o = s.tab('secondary_config', _('Secondary Config'));
 
-        o = s.taboption('secondary_config', form.Flag, 'second_enable', _('Secondary VPN/Proxy Enable'), _('Enable secondary VPN/Proxy configuration'));
+        o = s.taboption('secondary_config', form.Flag, 'second_enable', _('Secondary VPN/Proxy Enable'), _('Enable YouTube proxy (Not recommended)'));
         o.default = '0';
         o.rmempty = false;
         o.ucisection = 'second';
@@ -653,6 +653,8 @@ return view.extend({
             return true;
         };
 
+        o = s.tab('diagnostics', _('Diagnostics'));
+
         function formatDiagnosticOutput(output) {
             if (!output) return '';
 
@@ -666,140 +668,161 @@ return view.extend({
                     `: ${status === 'available' ? '✓' : '✗'}`);
         }
 
-
-        // Diagnostics Tab
-        o = s.tab('diagnostics', _('Diagnostics'));
-
-        // Добавим базовый стиль
-        document.head.insertAdjacentHTML('beforeend', `
-            <style>
-                .diagnostics-box {
-                    max-height: 70vh;
-                    overflow-y: auto;
-                    margin: 1em 0;
-                    padding: 1.5em;
-                    background: #f8f9fa;
-                    border: 1px solid #e9ecef;
-                    border-radius: 8px;
-                    font-family: monospace;
-                    white-space: pre-wrap;
-                    word-wrap: break-word;
-                    line-height: 1.5;
-                    font-size: 14px;
-                }
-
-                .diagnostics-buttons {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 1em;
-                }
-
-                .btn {
-                    background-color: #007bff;
-                    color: #fff;
-                    border: none;
-                    padding: 6px 12px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-
-                .btn:hover {
-                    background-color: #0056b3;
-                }
-            </style>
-        `);
-
-        // Удаление мусора из вывода
-        function cleanOutput(output) {
-            if (!output) return '';
-            return output
-                .replace(/\x1B\[[0-9;]*[mK]/g, '')
-                .replace(/\[[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\] /g, '')
-                .replace(/\n{3,}/g, '\n\n')
-                .replace(/===\s+(.*?)\s+===/g, (_, title) => `\n${title}\n${'─'.repeat(title.length)}`)
-                .replace(/^Checking\s+(.+)\.{3}/gm, '► Checking $1...')
-                .replace(/:\s+(available|not found)$/gm, (_, status) => `: ${status === 'available' ? '✓' : '✗'}`);
-        }
-
-        function showOutputModal(title, output) {
-            const formatted = cleanOutput(output || _('No output'));
-            const modal = ui.showModal(title, [
-                E('div', { class: 'diagnostics-box' }, [
-                    E('pre', {}, formatted)
-                ]),
-                E('div', { class: 'diagnostics-buttons' }, [
-                    E('button', {
-                        class: 'btn',
-                        click: function () {
-                            const textarea = document.createElement('textarea');
-                            textarea.value = '```txt\n' + formatted + '\n```';
-                            document.body.appendChild(textarea);
-                            textarea.select();
-                            try {
-                                document.execCommand('copy');
-                                ui.addNotification(null, E('p', {}, _('Copied to clipboard')));
-                            } catch (err) {
-                                ui.addNotification(null, E('p', {}, _('Copy failed: ') + err.message));
-                            }
-                            document.body.removeChild(textarea);
-                        }
-                    }, _('Copy')),
-                    E('button', {
-                        class: 'btn',
-                        click: ui.hideModal
-                    }, _('Close'))
-                ])
-            ], 'large');
-
-            if (modal && modal.parentElement) {
-                modal.parentElement.style.width = '90%';
-                modal.parentElement.style.maxWidth = '1200px';
-                modal.parentElement.style.margin = '2rem auto';
-            }
-        }
-
-        // Check All
+        // Check All - полная диагностика
         o = s.taboption('diagnostics', form.Button, '_check_all');
-        o.title = _('Run Check');
-        o.description = _('Run full diagnostic (check_three)');
-        o.inputtitle = _('Check All');
+        o.title = _('Main Check');
+        o.description = _('Run a comprehensive diagnostic check of all components');
+        o.inputtitle = _('Run Check');
         o.inputstyle = 'apply';
         o.onclick = function () {
             return fs.exec('/etc/init.d/mbzeguard', ['check_three'])
-                .then(res => showOutputModal(_('Diagnostic Results'), res.stdout))
-                .catch(err => ui.addNotification(null, E('p', {}, _('Error: ') + err.message)));
+                .then(function (res) {
+                    const formattedOutput = formatDiagnosticOutput(res.stdout || _('No output'));
+
+                    const modalElement = ui.showModal(_('Full Diagnostic Results'), [
+                        E('div', {
+                            style:
+                                'max-height: 70vh;' +
+                                'overflow-y: auto;' +
+                                'margin: 1em 0;' +
+                                'padding: 1.5em;' +
+                                'background: #f8f9fa;' +
+                                'border: 1px solid #e9ecef;' +
+                                'border-radius: 4px;' +
+                                'font-family: monospace;' +
+                                'white-space: pre-wrap;' +
+                                'word-wrap: break-word;' +
+                                'line-height: 1.5;' +
+                                'font-size: 14px;'
+                        }, [
+                            E('pre', { style: 'margin: 0;' }, formattedOutput)
+                        ]),
+                        E('div', {
+                            style: 'display: flex; justify-content: space-between; margin-top: 1em;'
+                        }, [
+                            E('button', {
+                                'class': 'btn',
+                                'click': function () {
+                                    const textarea = document.createElement('textarea');
+                                    textarea.value = '```txt\n' + formattedOutput + '\n```';
+                                    document.body.appendChild(textarea);
+                                    textarea.select();
+                                    try {
+                                        document.execCommand('copy');
+                                    } catch (err) {
+                                        ui.addNotification(null, E('p', {}, _('Failed to copy: ') + err.message));
+                                    }
+                                    document.body.removeChild(textarea);
+                                }
+                            }, _('Copy to Clipboard')),
+                            E('button', {
+                                'class': 'btn',
+                                'click': ui.hideModal
+                            }, _('Close'))
+                        ])
+                    ], 'large');
+
+                    if (modalElement && modalElement.parentElement) {
+                        modalElement.parentElement.style.width = '90%';
+                        modalElement.parentElement.style.maxWidth = '1200px';
+                        modalElement.parentElement.style.margin = '2rem auto';
+                    }
+                });
         };
 
-        // Logs
         o = s.taboption('diagnostics', form.Button, '_check_logs');
         o.title = _('System Logs');
-        o.description = _('Show logs from mbzeguard');
-        o.inputtitle = _('Show Logs');
+        o.description = _('View recent system logs related to MBzeGuard');
+        o.inputtitle = _('View Logs');
         o.inputstyle = 'apply';
         o.onclick = function () {
             return fs.exec('/etc/init.d/mbzeguard', ['check_logs'])
-                .then(res => showOutputModal(_('System Logs'), res.stdout))
-                .catch(err => ui.addNotification(null, E('p', {}, _('Error: ') + err.message)));
+                .then(function (res) {
+                    const formattedOutput = formatDiagnosticOutput(res.stdout || _('No output'));
+
+                    const modalElement = ui.showModal(_('System Logs'), [
+                        E('div', {
+                            style:
+                                'max-height: 70vh;' +
+                                'overflow-y: auto;' +
+                                'margin: 1em 0;' +
+                                'padding: 1.5em;' +
+                                'background: #f8f9fa;' +
+                                'border: 1px solid #e9ecef;' +
+                                'border-radius: 4px;' +
+                                'font-family: monospace;' +
+                                'white-space: pre-wrap;' +
+                                'word-wrap: break-word;' +
+                                'line-height: 1.5;' +
+                                'font-size: 14px;'
+                        }, [
+                            E('pre', { style: 'margin: 0;' }, formattedOutput)
+                        ]),
+                        E('div', {
+                            style: 'display: flex; justify-content: space-between; margin-top: 1em;'
+                        }, [
+                            E('button', {
+                                'class': 'btn',
+                                'click': function () {
+                                    const textarea = document.createElement('textarea');
+                                    textarea.value = '```txt\n' + formattedOutput + '\n```';
+                                    document.body.appendChild(textarea);
+                                    textarea.select();
+                                    try {
+                                        document.execCommand('copy');
+                                    } catch (err) {
+                                        ui.addNotification(null, E('p', {}, _('Failed to copy: ') + err.message));
+                                    }
+                                    document.body.removeChild(textarea);
+                                }
+                            }, _('Copy to Clipboard')),
+                            E('button', {
+                                'class': 'btn',
+                                'click': ui.hideModal
+                            }, _('Close'))
+                        ])
+                    ], 'large');
+
+                    if (modalElement && modalElement.parentElement) {
+                        modalElement.parentElement.style.width = '90%';
+                        modalElement.parentElement.style.maxWidth = '1200px';
+                        modalElement.parentElement.style.margin = '2rem auto';
+                    }
+                });
         };
 
-        // Update lists
         o = s.taboption('diagnostics', form.Button, '_list_update');
-        o.title = _('Update Lists');
-        o.description = _('Download and update domain/subnet lists');
-        o.inputtitle = _('Update');
+        o.title = _('Update lists');
+        o.description = _('Update all lists in config');
+        o.inputtitle = _('Update lists');
         o.inputstyle = 'apply';
         o.onclick = function () {
             fs.exec('/etc/init.d/mbzeguard', ['list_update']);
+
             ui.showModal(_('List Update'), [
-                E('p', {}, _('Lists are being updated in the background.')),
+                E('p', {}, _('Lists will be updated in background. You can check the progress in system logs.')),
                 E('div', { class: 'right' }, [
                     E('button', {
-                        class: 'btn',
-                        click: ui.hideModal
+                        'class': 'btn',
+                        'click': ui.hideModal
                     }, _('Close'))
                 ])
             ]);
         };
+
+        return m.render();
+    };
+
+        o = s.taboption('diagnostics', form.DummyValue, '_support_link', _('Support'));
+        o.rawhtml = true;
+        o.default = `
+            <a href="https://t.me/MBzeGuard" target="_blank" class="btn cbi-button cbi-button-apply" style="margin-right:10px;">
+                MBzeGuard
+            </a>
+            <div style="margin-top:5px; color: #888;">
+                <i class="cbi-tooltip">❓</i> Click to open Telegram support
+            </div>
+        `;
 
         return m.render();
     }
