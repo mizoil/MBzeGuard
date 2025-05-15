@@ -16,8 +16,8 @@ msgstr "Второй маршрут"
 msgid "Secondary VPN/Proxy Enable"
 msgstr "Включить второй VPN/Proxy"
 
-msgid "Enable YouTube proxy (Not recommended)."
-msgstr "Включить Proxy YouTube (Не рекомендую)."
+msgid "Enable YouTube proxy (Not recommended)"
+msgstr "Включить Proxy YouTube (Не рекомендую)"
 
 msgid "Connection Type"
 msgstr "Тип подключения"
@@ -325,8 +325,18 @@ msgstr "Системные логи"
 msgid "View recent system logs related to MBzeGuard"
 msgstr "Просмотр недавних системных логов, связанных с MBzeGuard"
 
+msgid "Update all lists in config"
+msgstr "Обновить все списки в конфигурации"
+
 msgid "View Logs"
 msgstr "Просмотр логов"
 
+msgid "Support"
+msgstr "Поддержка"
+
+msgid "Click to open Telegram support"
+msgstr "Нажмите, чтобы открыть поддержку в Telegram"
+
 msgid "Failed to copy logs: "
 msgstr "Ошибка копирования логов: "
+
