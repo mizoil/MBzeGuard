@@ -810,9 +810,6 @@ return view.extend({
             ]);
         };
 
-        return m.render();
-    };
-
         o = s.taboption('diagnostics', form.DummyValue, '_support_link', _('Support'));
         o.rawhtml = true;
         o.default = `
