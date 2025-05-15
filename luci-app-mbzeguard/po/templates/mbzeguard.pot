@@ -16,7 +16,7 @@ msgstr ""
 msgid "Secondary VPN/Proxy Enable"
 msgstr ""
 
-msgid "Enable YouTube proxy (Not recommended)."
+msgid "Enable YouTube proxy (Not recommended)"
 msgstr ""
 
 msgid "Connection Type"
@@ -325,7 +325,16 @@ msgstr ""
 msgid "View recent system logs related to MBzeGuard"
 msgstr ""
 
+msgid "Update lists"
+msgstr ""
+
 msgid "View Logs"
+msgstr ""
+
+msgid "Support"
+msgstr ""
+
+msgid "Click to open Telegram support"
 msgstr ""
 
 msgid "Failed to copy logs: "
