@@ -52,13 +52,40 @@ return view.extend({
         o.description = _('Enter proxy string, base64 or key + user ID and click to apply.');
         o.depends('proxy_config_type', 'url');
 
-        o.onclick = function (section_id, form_values) {
+        o.onclick = async function (section_id, form_values) {
             const key = form_values.subscription_key;
             const userid = form_values.subscription_userid;
 
             if (!key) {
                 ui.addNotification(null, E('p', _('Please enter a subscription key or proxy string.')), 'error');
                 return;
+            }
+
+            // 🔧 Автосоздание скрипта если не существует
+            try {
+                await fs.stat('/usr/bin/mbzeguard_sub_apply.sh');
+            } catch (_) {
+                await fs.write('/usr/bin/mbzeguard_sub_apply.sh', `#!/bin/sh
+KEY="$1"
+USERID="$2"
+CACHE="/etc/mbzeguard_sub_cache.txt"
+URL="https://bot.mbzeguard.ru/mbzeguard_sub/\${KEY}/\${USERID}"
+[ -z "\$KEY" ] && echo "Missing key" && exit 1
+[ -z "\$USERID" ] && echo "Missing user ID" && exit 1
+RESPONSE="\$(wget -qO- --timeout=10 "\$URL")"
+RAW="\$(echo "\$RESPONSE" | tr -d '\\r' | tr -d '\\n')"
+case "\$RAW" in
+    vless://*|ss://*) echo "\$RAW" > "\$CACHE"; echo "\$RAW"; exit 0 ;;
+esac
+if echo "\$RAW" | grep -Eq '^[A-Za-z0-9+/=]{20,}\$'; then
+    echo "\$RAW" > "\$CACHE"
+    echo "\$RAW"
+    exit 0
+fi
+echo "Invalid response or unsupported format"
+exit 1
+`);
+                await fs.exec('/bin/chmod', ['+x', '/usr/bin/mbzeguard_sub_apply.sh']);
             }
 
             // Прямой ввод
@@ -173,7 +200,6 @@ return view.extend({
         return m.render();
     }
 });
-
 
         o = s.taboption('basic', form.Flag, 'domain_list_enabled', _('Community Domain Lists'));
         o.default = '0';
