@@ -62,8 +62,8 @@ MBzeGuard — модифицированная версия проекта Podko
 Оригинальный проект: [itdoginfo/podkop](https://github.com/itdoginfo/podkop/)
 Автор оригинала: itdoginfo
 
-Модификация: mizoil
 Модификация проект: [mizoil/mbzeguard](https://github.com/mizoil/mbzeguard)
+Модификация: mizoil
 
 Программа распространяется под лицензией GNU General Public License v2.0
 
