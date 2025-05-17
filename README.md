@@ -56,12 +56,16 @@ opkg remove luci-i18n-mbzeguard-ru  # если был установлен
     Веб-интерфейс: Services → MBzeGuard
 
 📖 Лицензия
+
 MBzeGuard — модифицированная версия проекта Podkop
+
 Оригинальный проект: [itdoginfo/podkop](https://github.com/itdoginfo/podkop/)
 Автор оригинала: itdoginfo
+
 Модификация: mizoil
 Модификация проект: [mizoil/mbzeguard](https://github.com/mizoil/mbzeguard)
 
 Программа распространяется под лицензией GNU General Public License v2.0
+
 Подробности — в файле LICENSE
 
