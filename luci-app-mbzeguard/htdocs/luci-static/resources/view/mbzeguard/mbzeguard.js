@@ -29,20 +29,113 @@ return view.extend({
         o.depends('mode', 'proxy');
         o.ucisection = 'main';
 
+        // Proxy manual input
         o = s.taboption('basic', form.TextValue, 'proxy_string', _('Proxy Configuration URL'), _('Enter connection string starting with vless:// or ss:// for proxy configuration'));
         o.depends('proxy_config_type', 'url');
         o.rows = 5;
         o.ucisection = 'main';
 
+        // Subscription Key
+        o = s.taboption('basic', form.Value, 'subscription_key', _('Subscription Key'), _('Enter subscription access key, full proxy string or base64'));
+        o.depends('proxy_config_type', 'url');
+        o.ucisection = 'main';
+
+        // Subscription User ID
+        o = s.taboption('basic', form.Value, 'subscription_userid', _('Subscription User ID'), _('Enter your subscription user ID (if using a key)'));
+        o.depends('proxy_config_type', 'url');
+        o.ucisection = 'main';
+
+        // Fetch Button
+        o = s.taboption('basic', form.Button, '_fetch_proxy_string');
+        o.inputtitle = _('Fetch and apply from link');
+        o.inputstyle = 'apply';
+        o.description = _('Enter proxy string, base64 or key + user ID and click to apply.');
+        o.depends('proxy_config_type', 'url');
+
+        o.onclick = function (section_id, form_values) {
+            const key = form_values.subscription_key;
+            const userid = form_values.subscription_userid;
+
+            if (!key) {
+                ui.addNotification(null, E('p', _('Please enter a subscription key or proxy string.')), 'error');
+                return;
+            }
+
+            // Прямой ввод
+            if (key.startsWith('vless://') || key.startsWith('ss://')) {
+                return applyProxyDirect(key);
+            }
+
+            // Base64 без user_id
+            if (!userid && /^[A-Za-z0-9+/=]{20,}$/.test(key)) {
+                return fs.exec('/bin/sh', ['-c', `echo '${key}' | base64 -d`])
+                    .then(function (decoded) {
+                        const proxy = decoded.stdout.trim();
+                        if (proxy.startsWith('vless://') || proxy.startsWith('ss://')) {
+                            return applyProxyDirect(proxy);
+                        } else {
+                            ui.addNotification(null, E('p', _('Decoded base64 is invalid:\n') + proxy), 'error');
+                        }
+                    });
+            }
+
+            // Ключ + user_id — запрос с сервера
+            if (!userid) {
+                ui.addNotification(null, E('p', _('Please enter user ID if using subscription key.')), 'error');
+                return;
+            }
+
+            return fs.exec('/usr/bin/mbzeguard_sub_apply.sh', [key, userid])
+                .then(function (res) {
+                    const raw = res.stdout.trim();
+
+                    // Base64?
+                    if (/^[A-Za-z0-9+/=]{20,}$/.test(raw)) {
+                        return fs.exec('/bin/sh', ['-c', `echo '${raw}' | base64 -d`])
+                            .then(function (decoded) {
+                                const proxy = decoded.stdout.trim();
+                                if (proxy.startsWith('vless://') || proxy.startsWith('ss://')) {
+                                    return applyProxyDirect(proxy);
+                                } else {
+                                    ui.addNotification(null, E('p', _('Decoded response is invalid:\n') + proxy), 'error');
+                                }
+                            });
+                    }
+
+                    // Прямой vless:// или ss://
+                    if (raw.startsWith('vless://') || raw.startsWith('ss://')) {
+                        return applyProxyDirect(raw);
+                    }
+
+                    ui.addNotification(null, E('p', _('Invalid or unsupported server response:\n') + raw), 'error');
+                })
+                .catch(function (err) {
+                    ui.addNotification(null, E('p', _('Error fetching from subscription server:\n') + (err || '✗')), 'error');
+                });
+
+            function applyProxyDirect(proxyString) {
+                return fs.exec('/bin/sh', ['-c',
+                    `uci set mbzeguard.main.mode='proxy'; \
+                     uci set mbzeguard.main.proxy_config_type='url'; \
+                     uci set mbzeguard.main.proxy_string='${proxyString}'; \
+                     uci commit mbzeguard; \
+                     /etc/init.d/mbzeguard restart`])
+                    .then(function () {
+                        ui.addNotification(null, E('p', _('Proxy config applied:\n') + proxyString), 'info');
+                    })
+                    .catch(function (err) {
+                        ui.addNotification(null, E('p', _('Failed to apply config:\n') + (err || '✗')), 'error');
+                    });
+            }
+        };
+
+        // JSON config (outbound)
         o = s.taboption('basic', form.TextValue, 'outbound_json', _('Outbound Configuration'), _('Enter complete outbound configuration in JSON format'));
         o.depends('proxy_config_type', 'outbound');
         o.rows = 10;
         o.ucisection = 'main';
         o.validate = function (section_id, value) {
-            if (!value || value.length === 0) {
-                return true;
-            }
-
+            if (!value || value.length === 0) return true;
             try {
                 const parsed = JSON.parse(value);
                 if (!parsed.type || !parsed.server || !parsed.server_port) {
@@ -54,6 +147,7 @@ return view.extend({
             }
         };
 
+        // VPN интерфейсы
         o = s.taboption('basic', form.ListValue, 'interface', _('Network Interface'), _('Select network interface for VPN connection'));
         o.depends('mode', 'vpn');
         o.ucisection = 'main';
@@ -75,6 +169,11 @@ return view.extend({
         } catch (error) {
             console.error('Error fetching devices:', error);
         }
+
+        return m.render();
+    }
+});
+
 
         o = s.taboption('basic', form.Flag, 'domain_list_enabled', _('Community Domain Lists'));
         o.default = '0';
