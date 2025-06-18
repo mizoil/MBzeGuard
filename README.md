@@ -53,4 +53,4 @@ opkg remove luci-i18n-mbzeguard-ru  # если был установлен
 
     Файл: /etc/config/mbzeguard
 
-    Веб-интерфейс: Services → MBzeGuard
+    Веб-интерфейс: VPN → MBzeGuard
